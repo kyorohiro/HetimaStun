@@ -20,7 +20,7 @@ public class TestForHtunHeader extends TestCase {
 		byte[] buffer = CashKyoroFileHelper.newBinary(output);
 		{
 			byte[] expected = {
-					0x00, 0x00, 
+					//0x00, 0x00, 
 					0x00, HtunHeader.BINDING_REQUEST,
 					0x00, 0x00, // length
 					1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 //id
@@ -48,7 +48,7 @@ public class TestForHtunHeader extends TestCase {
 		byte[] buffer = CashKyoroFileHelper.newBinary(output);
 		{
 			byte[] expected = {
-					0x00, 0x00, 
+					//0x00, 0x00, 
 					0x00, HtunHeader.BINDING_REQUEST,
 					0x00, 0x08, // length
 					1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, //id
@@ -87,7 +87,7 @@ public class TestForHtunHeader extends TestCase {
 		byte[] buffer = CashKyoroFileHelper.newBinary(output);
 		{
 			byte[] expected = {
-					0x00, 0x00, 
+					//0x00, 0x00, 
 					0xFF&(HtunHeader.BINDING_RESPONSE>>8), 0xFF&HtunHeader.BINDING_RESPONSE,
 					0x00, 0x0C, // length
 					1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, //id
@@ -141,7 +141,7 @@ public class TestForHtunHeader extends TestCase {
 		byte[] buffer = CashKyoroFileHelper.newBinary(output);
 		{
 			byte[] expected = {
-					0x00, 0x00, 
+					//0x00, 0x00, 
 					0xFF&(HtunHeader.BINDING_RESPONSE>>8), 0xFF&HtunHeader.BINDING_RESPONSE,
 					0x00, 36, // length
 					1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, //id

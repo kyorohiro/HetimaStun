@@ -64,7 +64,8 @@ public class HtunHeader {
 
 	public void encode(OutputStream output) throws IOException {
 		// 2byte zero sign 
-		output.write(ByteArrayBuilder.parseShort(0, ByteArrayBuilder.BYTEORDER_BIG_ENDIAN));
+		//
+		//output.write(ByteArrayBuilder.parseShort(0, ByteArrayBuilder.BYTEORDER_BIG_ENDIAN));
 
 		// 2byte message type 
 		output.write(ByteArrayBuilder.parseShort(mType, ByteArrayBuilder.BYTEORDER_BIG_ENDIAN));
@@ -87,8 +88,8 @@ public class HtunHeader {
 
 	public static HtunHeader decode(MarkableFileReader reader) throws IOException {
 		// 2byte zero sign.  
-		int sign = MarkableReaderHelper.readShort(reader, ByteArrayBuilder.BYTEORDER_BIG_ENDIAN);
-		if(sign != 0) {throw new IOException("bad sign "+sign);}
+		//int sign = MarkableReaderHelper.readShort(reader, ByteArrayBuilder.BYTEORDER_BIG_ENDIAN);
+		//if(sign != 0) {throw new IOException("bad sign "+sign);}
 
 		// 2byte message type
 		int messageType = MarkableReaderHelper.readShort(reader, ByteArrayBuilder.BYTEORDER_BIG_ENDIAN);
