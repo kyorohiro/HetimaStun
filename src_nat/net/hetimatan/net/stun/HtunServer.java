@@ -8,6 +8,7 @@ import net.hetimatan.io.filen.CashKyoroFileHelper;
 import net.hetimatan.net.stun.message.HtunAttribute;
 import net.hetimatan.net.stun.message.HtunHeader;
 import net.hetimatan.net.stun.message.attribute.HtunChangeRequest;
+import net.hetimatan.net.stun.message.attribute.HtunUnknownAttribute;
 import net.hetimatan.net.stun.message.attribute.HtunXxxAddress;
 import net.hetimatan.util.event.EventTask;
 import net.hetimatan.util.event.EventTaskRunner;
@@ -123,6 +124,9 @@ public class HtunServer {
 	}
 
 	public KyoroDatagramImpl selectSocket(HtunChangeRequest changeRequest) {
+		if (changeRequest == null) {
+			return mMainIp_MainPort;
+		}
 		boolean changePort = changeRequest.chagePort();
 		boolean changeIp = changeRequest.changeIp();
 		KyoroDatagramImpl tmp = null;
@@ -149,14 +153,17 @@ public class HtunServer {
 		return CashKyoroFileHelper.newBinary(output);
 	}
 
-	public byte[] createErrorResponse(HtunHeader header, byte[] mappedIp, KyoroDatagramImpl responseSocket) throws IOException {
+	public byte[] createErrorUnknownAttributeResponse(HtunHeader header, int[] types, KyoroDatagramImpl responseSocket) throws IOException {
 		HtunHeader response = new HtunHeader(HtunHeader.BINDING_ERROR_RESPONSE, header.getId());
-
+		HtunUnknownAttribute attribute = new HtunUnknownAttribute();
+		for(int type:types) {
+			attribute.addUnknownAttribute(type);
+		}
 		CashKyoroFile output = new CashKyoroFile(1024);
 		response.encode(output.getLastOutput());
 		return CashKyoroFileHelper.newBinary(output);
 	}
-	
+
 	public class ReceiveTask extends EventTask {
 		@Override
 		public void action(EventTaskRunner runner) throws Throwable {
@@ -167,17 +174,22 @@ public class HtunServer {
 			// parse message
 			HtunHeader header = parseMessage(buffer);
 			HtunChangeRequest changeRequest = parseMessage(header);
-			if(changeRequest == null) {
-				// error response
-				return;
-			}
 
 			// select response socket
  			KyoroDatagramImpl responseSocket = selectSocket(changeRequest);
 
 			// create response
-			byte[] responseSource = createBindingResponse(header, mappedIp, responseSocket);
-			
+ 			byte[] responseSource;
+			if(changeRequest == null) {
+				int[] types = new int[header.numOfAttribute()];
+				for(int i=0;i<types.length;i++) {
+					types[i] = header.getHtunAttribute(i).getType();
+				}
+				responseSource = createErrorUnknownAttributeResponse(header, types, responseSocket);
+			} else  {
+				responseSource = createBindingResponse(header, mappedIp, responseSocket);
+			}
+
 			// send
 			runner.pushTask(new SendTask(responseSocket, mappedIp, responseSource));
 		}

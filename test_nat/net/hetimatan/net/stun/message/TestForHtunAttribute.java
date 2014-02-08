@@ -50,13 +50,13 @@ public class TestForHtunAttribute extends TestCase {
 
 
 	public void testUnknownAttribute() throws IOException {
-		HtunUnknownAttribute changeRequest = new HtunUnknownAttribute();
-		changeRequest.addUnknownAttribute(10001);
-		assertEquals(1, changeRequest.numOfUnknownAttributeType());
-		assertEquals(10001, changeRequest.getUnknownAttributeType(0));
+		HtunUnknownAttribute attribute = new HtunUnknownAttribute();
+		attribute.addUnknownAttribute(10001);
+		assertEquals(1, attribute.numOfUnknownAttributeType());
+		assertEquals(10001, attribute.getUnknownAttributeType(0));
 		
 		CashKyoroFile file = new CashKyoroFile(100);
-		changeRequest.encode(file.getLastOutput());
+		attribute.encode(file.getLastOutput());
 		byte[] buffer = CashKyoroFileHelper.newBinary(file);
 		{
 			PercentEncoder encoder = new PercentEncoder();
@@ -78,14 +78,14 @@ public class TestForHtunAttribute extends TestCase {
 					0x27,0x11, 0x00,0x11,
 				};
 			MarkableFileReader reader = new MarkableFileReader(source);
-			HtunUnknownAttribute decodedRequest = HtunUnknownAttribute.decode(reader);
+			HtunUnknownAttribute decodedAttribute = HtunUnknownAttribute.decode(reader);
 			{
 				PercentEncoder encoder = new PercentEncoder();
 				System.out.println(encoder.encode(buffer));
 			}
-			assertEquals(2, decodedRequest.numOfUnknownAttributeType());
-			assertEquals(10001, decodedRequest.getUnknownAttributeType(0));
-			assertEquals(0x11, decodedRequest.getUnknownAttributeType(1));
+			assertEquals(2, decodedAttribute.numOfUnknownAttributeType());
+			assertEquals(10001, decodedAttribute.getUnknownAttributeType(0));
+			assertEquals(0x11, decodedAttribute.getUnknownAttributeType(1));
 		}
 	}
 	
