@@ -138,7 +138,7 @@ public class HtunServer {
 		return tmp;
 	}
 
-	public byte[] createResponse(HtunHeader header, byte[] mappedIp, KyoroDatagramImpl responseSocket) throws IOException {
+	public byte[] createBindingResponse(HtunHeader header, byte[] mappedIp, KyoroDatagramImpl responseSocket) throws IOException {
 		HtunHeader response = new HtunHeader(HtunHeader.BINDING_RESPONSE, header.getId());
 		response.addAttribute(new HtunXxxAddress(HtunAttribute.MAPPED_ADDRESS, 0x01, mappedIp));
 		response.addAttribute(new HtunXxxAddress(HtunAttribute.SOURCE_ADDRESS, 0x01, (byte[])responseSocket.getMemo()));
@@ -149,6 +149,14 @@ public class HtunServer {
 		return CashKyoroFileHelper.newBinary(output);
 	}
 
+	public byte[] createErrorResponse(HtunHeader header, byte[] mappedIp, KyoroDatagramImpl responseSocket) throws IOException {
+		HtunHeader response = new HtunHeader(HtunHeader.BINDING_ERROR_RESPONSE, header.getId());
+
+		CashKyoroFile output = new CashKyoroFile(1024);
+		response.encode(output.getLastOutput());
+		return CashKyoroFileHelper.newBinary(output);
+	}
+	
 	public class ReceiveTask extends EventTask {
 		@Override
 		public void action(EventTaskRunner runner) throws Throwable {
@@ -168,7 +176,7 @@ public class HtunServer {
  			KyoroDatagramImpl responseSocket = selectSocket(changeRequest);
 
 			// create response
-			byte[] responseSource = createResponse(header, mappedIp, responseSocket);
+			byte[] responseSource = createBindingResponse(header, mappedIp, responseSocket);
 			
 			// send
 			runner.pushTask(new SendTask(responseSocket, mappedIp, responseSource));

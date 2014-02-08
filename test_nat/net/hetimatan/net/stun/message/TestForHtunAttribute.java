@@ -7,6 +7,7 @@ import net.hetimatan.io.file.MarkableFileReader;
 import net.hetimatan.io.filen.CashKyoroFile;
 import net.hetimatan.io.filen.CashKyoroFileHelper;
 import net.hetimatan.net.stun.message.attribute.HtunChangeRequest;
+import net.hetimatan.net.stun.message.attribute.HtunUnknownAttribute;
 import net.hetimatan.util.url.PercentEncoder;
 import junit.framework.TestCase;
 
@@ -46,4 +47,47 @@ public class TestForHtunAttribute extends TestCase {
 			assertEquals(true, decodedRequest.changeIp());
 		}
 	}
+
+
+	public void testUnknownAttribute() throws IOException {
+		HtunUnknownAttribute changeRequest = new HtunUnknownAttribute();
+		changeRequest.addUnknownAttribute(10001);
+		assertEquals(1, changeRequest.numOfUnknownAttributeType());
+		assertEquals(10001, changeRequest.getUnknownAttributeType(0));
+		
+		CashKyoroFile file = new CashKyoroFile(100);
+		changeRequest.encode(file.getLastOutput());
+		byte[] buffer = CashKyoroFileHelper.newBinary(file);
+		{
+			PercentEncoder encoder = new PercentEncoder();
+			System.out.println(encoder.encode(buffer));
+		}
+
+		{//encode test
+			byte[] result = {
+				0x00, HtunAttribute.UNKNOWN_ATTRIBUTE, 0x00, 0x02,0x27,0x11
+			};
+			for(int i=0;i<result.length;i++) {
+				assertEquals("["+i+"]", result[i], buffer[i]);
+			}
+		}
+		
+		{//decode test
+			byte[] source = {
+					0x00, HtunAttribute.UNKNOWN_ATTRIBUTE, 0x00, 0x04,
+					0x27,0x11, 0x00,0x11,
+				};
+			MarkableFileReader reader = new MarkableFileReader(source);
+			HtunUnknownAttribute decodedRequest = HtunUnknownAttribute.decode(reader);
+			{
+				PercentEncoder encoder = new PercentEncoder();
+				System.out.println(encoder.encode(buffer));
+			}
+			assertEquals(2, decodedRequest.numOfUnknownAttributeType());
+			assertEquals(10001, decodedRequest.getUnknownAttributeType(0));
+			assertEquals(0x11, decodedRequest.getUnknownAttributeType(1));
+		}
+	}
+	
+
 }
